@@ -2,31 +2,14 @@ package com.crobox.clickhouse.dsl.language
 
 import java.util.UUID
 
-import com.crobox.clickhouse.dsl.marshalling.QueryValueFormats._
-import com.crobox.clickhouse.dsl.{
-  AggregateFunction,
-  Case,
-  ColumnOperations,
-  CombinedAggregatedFunction,
-  Conditional,
-  InnerFromQuery,
-  InternalQuery,
-  JoinQuery,
-  Limit,
-  NoOpComparison,
-  OperationalQuery,
-  SelectQuery,
-  TableColumn,
-  TableFromQuery,
-  TestSchema,
-  TimeSeries,
-  Uniq
-}
+import com.crobox.clickhouse.dsl._
+import com.crobox.clickhouse.dsl.column.AggregationFunctions
+import com.crobox.clickhouse.dsl.column.AggregationFunctions._
 import com.crobox.clickhouse.testkit.ClickhouseClientSpec
 import com.crobox.clickhouse.time.{MultiDuration, MultiInterval, TimeUnit}
 import org.joda.time.{DateTime, DateTimeZone}
 
-class ClickhouseTokenizerTest extends ClickhouseClientSpec with TestSchema with ClickhouseTokenizerModule {
+class ClickhouseTokenizerTest extends ClickhouseClientSpec with TestSchema with ClickhouseTokenizerModule  {
   val testSubject = this
 
   "building select statement" should "build select statement" in {
@@ -182,12 +165,12 @@ class ClickhouseTokenizerTest extends ClickhouseClientSpec with TestSchema with 
   }
 
   "Aggregated functions" should "build with combinators" in {
-    this.tokenizeColumn(CombinedAggregatedFunction(AggregateFunction.If(col1.isEq("test")), Uniq(col1))) shouldBe s"uniqIf(${col1.name},${col1.name} = 'test')"
-    this.tokenizeColumn(CombinedAggregatedFunction(AggregateFunction.If(col1.isEq("test")), Uniq(col1, Uniq.HLL12))) shouldBe s"uniqHLL12If(${col1.name},${col1.name} = 'test')"
-    this.tokenizeColumn(CombinedAggregatedFunction(AggregateFunction.If(col1.isEq("test")), Uniq(col1, Uniq.Combined))) shouldBe s"uniqCombinedIf(${col1.name},${col1.name} = 'test')"
+    this.tokenizeColumn(CombinedAggregatedFunction(Combinator.If(col1.isEq("test")), Uniq(col1))) shouldBe s"uniqIf(${col1.name},${col1.name} = 'test')"
+    this.tokenizeColumn(CombinedAggregatedFunction(Combinator.If(col1.isEq("test")), Uniq(col1, UniqModifier.HLL12))) shouldBe s"uniqHLL12If(${col1.name},${col1.name} = 'test')"
+    this.tokenizeColumn(CombinedAggregatedFunction(Combinator.If(col1.isEq("test")), Uniq(col1, UniqModifier.Combined))) shouldBe s"uniqCombinedIf(${col1.name},${col1.name} = 'test')"
     this.tokenizeColumn(
-      CombinedAggregatedFunction(AggregateFunction.If(col1.isEq("test")),
-                                 CombinedAggregatedFunction(AggregateFunction.If(col2.isEq(3)), Uniq(col1, Uniq.Exact)))
+      CombinedAggregatedFunction(Combinator.If(col1.isEq("test")),
+                                 CombinedAggregatedFunction(Combinator.If(col2.isEq(3)), Uniq(col1, UniqModifier.Exact)))
     ) shouldBe s"uniqExactIfIf(${col1.name},${col2.name} = 3,${col1.name} = 'test')"
   }
 

@@ -1,12 +1,9 @@
 package com.crobox.clickhouse
 
-import com.crobox.clickhouse.dsl.AggregateFunction.AggregationFunctionsCombinersDsl
-import com.crobox.clickhouse.dsl.AnyResult.AnyResultDsl
-import com.crobox.clickhouse.dsl.Leveled.LevelModifierDsl
+import com.crobox.clickhouse.dsl.column.AggregationFunctions.AggregationFunctionsCombinersDsl
+
 import com.crobox.clickhouse.dsl.{ColumnOperations, QueryFactory}
-import com.crobox.clickhouse.dsl.Sum.SumDsl
 import com.crobox.clickhouse.dsl.TableColumn.AnyTableColumn
-import com.crobox.clickhouse.dsl.Uniq.UniqDsl
 import com.crobox.clickhouse.dsl.execution.{ClickhouseQueryExecutor, QueryResult}
 import com.crobox.clickhouse.dsl.marshalling.{QueryValue, QueryValueFormats}
 import com.dongxiguo.fastring.Fastring.Implicits._
@@ -19,10 +16,6 @@ import scala.util.Try
 trait DslLanguage
     extends ColumnOperations
     with AggregationFunctionsCombinersDsl
-    with UniqDsl
-    with AnyResultDsl
-    with SumDsl
-    with LevelModifierDsl
     with QueryFactory
     with QueryValueFormats
 object DslLanguage extends DslLanguage
